@@ -39,7 +39,7 @@ Results across all trials are aggregated into per-team probabilities.
 
 **Multithreaded Simulation** — Trials are split evenly across configurable worker threads. Each thread maintains its own independent RNG stream (`std::mt19937_64`, seeded with `base_seed + thread_id`) and its own local `AggregateStats` accumulator. There is zero shared mutable state during parallel execution — results are merged once after all threads complete via `.join()`.
 
-**Test Suite** — 24 targeted assertions covering:
+**Test Suite** — 25 targeted assertions covering:
 - Elo model correctness (symmetry, zero-sum conservation, upset scaling)
 - Schedule structural integrity (exact game counts, no self-matches, no invalid repeats)
 - Simulation validity (correct playoff field size, trial independence via pass-by-value isolation)
@@ -60,7 +60,7 @@ make
 # Run with custom settings
 ./build/nfl_sim --trials 20000 --threads 4 --seed 7
 
-# Build and run the test suite (24 tests)
+# Build and run the test suite (25 tests)
 make test
 
 # Clean build artifacts
@@ -96,7 +96,7 @@ src/                        Implementations
 └── main.cpp                  CLI entry point + report formatting
 
 tests/
-└── test_main.cpp             24 assertion-based tests (no external framework)
+└── test_main.cpp             25 assertion-based tests (no external framework)
 
 data/
 └── teams.csv                 32 teams with conference, division, starting Elo
