@@ -38,6 +38,11 @@ std::vector<Team> load_teams_csv(const std::string& path) {
         t.elo = std::stod(fields[3]);
         teams.push_back(t);
     }
+
+    if (teams.empty()) {
+        throw std::runtime_error("No teams loaded from CSV (file may be empty or malformed): " + path);
+    }
+    
     return teams;
 }
 
