@@ -1,3 +1,5 @@
+[![CI](https://github.com/ervinjohn50/nfl-monte-carlo-simulator/actions/workflows/ci.yml/badge.svg)](https://github.com/ervinjohn50/nfl-monte-carlo-simulator/actions)
+
 # NFL Monte Carlo Season Simulator
 
 A multithreaded C++17 Monte Carlo simulator that predicts NFL playoff, division-title, and Super Bowl probabilities by simulating thousands of independent seasons using an Elo rating model.
