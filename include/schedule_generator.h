@@ -16,7 +16,7 @@ namespace nflsim {
 //
 // This mirrors the real NFL scheduling formula closely but simplifies the
 // "based on prior-year standings" rules, which require data this project
-// doesn't track. Game order is not mapped to actual calendar weeks --
+// doesn't track. Game order is not mapped to actual calendar weeks.
 // standings only depend on the final win/loss totals, not sequencing.
 std::vector<Game> generate_season_schedule(const std::vector<Team>& teams,
                                             unsigned int seed);

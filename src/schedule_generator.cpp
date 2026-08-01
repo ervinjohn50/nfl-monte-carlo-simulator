@@ -47,7 +47,7 @@ void add_cross_group_single_leg(const TeamGroup& a, const TeamGroup& b,
 
 // Builds a random 3-regular bipartite "schedule" between two equal-size groups
 // (8 teams each in practice) using three randomly generated permutations that
-// are pairwise non-colliding per position -- guarantees each team gets exactly
+// are pairwise non-colliding per position. Guarantees each team gets exactly
 // 3 distinct opponents from the other group, with no repeated matchup.
 std::vector<std::pair<int, int>> random_3_regular_bipartite(
     const TeamGroup& a, const TeamGroup& b, std::mt19937& rng) {
