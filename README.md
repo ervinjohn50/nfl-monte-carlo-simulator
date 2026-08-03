@@ -5,7 +5,7 @@
 A multithreaded C++17 Monte Carlo simulator that predicts NFL playoff, division-title, and Super Bowl probabilities by simulating thousands of independent seasons using an Elo rating model.
 
 ```
-$ ./build/nfl_sim --trials 20000 --threads 4
+$ ./build/nfl_simulator --trials 20000 --threads 4
 Running 20000 season simulations across 4 thread(s)...
 Done in 353.2 ms (56628.9 seasons/sec)
 
@@ -57,10 +57,10 @@ Requires a C++17 compiler. No external dependencies — uses only the C++ standa
 make
 
 # Run with default settings (10,000 trials, auto-detected thread count)
-./build/nfl_sim
+./build/nfl_simulator
 
 # Run with custom settings
-./build/nfl_sim --trials 20000 --threads 4 --seed 7
+./build/nfl_simulator --trials 20000 --threads 4 --seed 7
 
 # Build and run the test suite (25 tests)
 make test
