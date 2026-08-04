@@ -5,16 +5,20 @@
 A multithreaded C++17 Monte Carlo simulator that predicts NFL playoff, division-title, and Super Bowl probabilities by simulating thousands of independent seasons using an Elo rating model.
 
 ```
-$ ./build/nfl_simulator --trials 20000 --threads 4
+./build/nfl_simulator --trials 20000 --threads 4
+Loading teams from data/teams.csv...
+Loaded 32 teams.
+Generated schedule with 272 games.
 Running 20000 season simulations across 4 thread(s)...
-Done in 353.2 ms (56628.9 seasons/sec)
+Done in 77.8 ms (257065.1 seasons/sec)
 
 Team                        Playoff%      Div%     Conf%   SB Champ%
 --------------------------------------------------------------------
-Buffalo Bills                   91.1      76.1      24.6        13.8
-Kansas City Chiefs              84.3      65.7      22.7        13.0
-Philadelphia Eagles             81.8      56.5      22.1        11.7
-Detroit Lions                   79.6      53.2      19.2         9.4
+Buffalo Bills                   88.8      72.7      24.0        13.5
+Kansas City Chiefs              81.5      62.1      22.1        12.9
+Philadelphia Eagles             83.3      58.2      21.8        11.5
+Baltimore Ravens                79.0      51.6      15.6         8.4
+Detroit Lions                   68.3      39.4      15.4         8.3
 ...
 ```
 
