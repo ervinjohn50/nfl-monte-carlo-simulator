@@ -45,7 +45,7 @@ Results across all trials are aggregated into per-team probabilities.
 - Cross-group single-leg pairings (within-conference and interconference)
 - Randomized 3-regular bipartite graph matching for crossover games, with collision detection to guarantee no duplicate matchups
 
-**Multithreaded Simulation** — Trials are split evenly across configurable worker threads. Each thread maintains its own independent RNG stream (`std::mt19937_64`, seeded with `base_seed + thread_id`) and its own local `AggregateStats` accumulator. There is zero shared mutable state during parallel execution — results are merged once after all threads complete via `.join()`.
+**Multithreaded Simulation** — Trials are split evenly across configurable worker threads. Each thread maintains its own independent RNG stream (`std::mt19937_64`, seeded with `base_seed + thread_id`) and its own local `AggregateStats` accumulator. There is zero shared mutable state during parallel execution. Results are merged once after all threads complete via `.join()`.
 
 **Test Suite** — 25 targeted assertions covering:
 - Elo model correctness (symmetry, zero-sum conservation, upset scaling)
@@ -146,7 +146,7 @@ data/
 
 ### Architecture
 
-Each module is fully decoupled — the Elo model knows nothing about schedule construction, the schedule generator knows nothing about ratings, and the Monte Carlo runner knows nothing about football. Components communicate only through the data structures defined in `types.h`. Any individual module (a different rating model, a different sport's schedule rules, a different bracket format) can be swapped without touching the others.
+Each module is fully decoupled. The Elo model knows nothing about schedule construction, the schedule generator knows nothing about ratings, and the Monte Carlo runner knows nothing about football. Components communicate only through the data structures defined in `types.h`. Any individual module (a different rating model, a different sport's schedule rules, a different bracket format) can be swapped without touching the others.
 
 ## Team Data
 
