@@ -2,7 +2,7 @@
 
 # NFL Monte Carlo Season Simulator
 
-A multithreaded C++17 Monte Carlo simulator that predicts NFL playoff, division-title, and Super Bowl probabilities by simulating thousands of independent seasons using an Elo rating model.
+A multithreaded C++17 Monte Carlo simulator that predicts NFL playoff, division-title, and Super Bowl probabilities by simulating thousands of independent seasons using an Elo rating model. Includes an interactive web dashboard for visualizing results in real time.
 
 ```
 ./build/nfl_simulator --trials 20000 --threads 4
@@ -54,7 +54,7 @@ Results across all trials are aggregated into per-team probabilities.
 
 ## Build & Run
 
-Requires a C++17 compiler. No external dependencies — uses only the C++ standard library.
+Requires a C++17 compiler. No external dependencies for the CLI. Uses only the C++ standard library.
 
 ```bash
 # Build the simulator
@@ -65,6 +65,9 @@ make
 
 # Run with custom settings
 ./build/nfl_simulator --trials 20000 --threads 4 --seed 7
+
+# Output results as JSON
+./build/nfl_simulator --json --trials 10000
 
 # Build and run the test suite (25 tests)
 make test
@@ -81,6 +84,32 @@ make clean
 | `--threads N` | Hardware core count | Number of worker threads |
 | `--seed N` | 42 | Base RNG seed (for reproducibility) |
 | `--teams path` | `data/teams.csv` | Path to team data CSV |
+| `--json` | off | Output results as JSON instead of a formatted table |
+
+## Web Dashboard
+
+An interactive browser-based dashboard for running simulations and visualizing results. Adjust trial count and seed, click Simulate, and see probability charts update in real time.
+
+### Setup
+
+```bash
+# Create a virtual environment and install Flask (one time)
+python3 -m venv .venv && .venv/bin/pip install flask
+
+# Build the simulator and start the dashboard server
+make dashboard
+```
+
+Then open `http://127.0.0.1:5050` in your browser.
+
+### Features
+
+- **Live simulation** — change trials (1K–100K) and seed, re-run from the browser
+- **Four chart categories** — Super Bowl Champion, Conference Champion, Division Winner, Make Playoffs
+- **Sort by probability or division** — toggle between ranking and divisional grouping
+- **Hover tooltips** — see full stats for any team (Elo, all four probabilities)
+- **Performance stats** — trial count, elapsed time, and throughput (seasons/sec)
+- **Dark/light theme** — follows your OS preference
 
 ## Project Structure
 
@@ -100,6 +129,11 @@ src/                        Implementations
 ├── monte_carlo_runner.cpp
 ├── csv_loader.cpp
 └── main.cpp                  CLI entry point + report formatting
+
+viz/
+└── index.html                Interactive web dashboard (self-contained HTML/CSS/JS)
+
+server.py                   Flask API server (bridges the browser to the C++ binary)
 
 tests/
 └── test_main.cpp             25 assertion-based tests (no external framework)
@@ -140,3 +174,4 @@ Philadelphia Eagles,NFC,East,1610
 - Incorporate dynamic team-strength adjustment (e.g., mid-season Elo regression toward the mean to model roster changes)
 - Replace the CSV loader with a live stats API integration for real-time preseason ratings
 - Add a work-stealing thread pool for better load balancing at very high trial counts
+- Add an Elo editor to the dashboard for "what if" scenario modeling
