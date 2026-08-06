@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NFL Monte Carlo Simulator</title>
+<style>
+  :root {
+    color-scheme: light;
+    --surface-page: #f9f9f7;
+    --surface-card: #fcfcfb;
+    --text-primary: #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted: #898781;
+    --gridline: #e1e0d9;
+    --baseline: #c3c2b7;
+    --border: rgba(11,11,11,0.10);
+    --series-afc: #2a78d6;
+    --series-nfc: #eb6834;
+    --series-afc-hover: #1c5cab;
+    --series-nfc-hover: #c9521c;
+    --bar-bg: #e1e0d9;
+    --control-bg: #ffffff;
+    --control-border: #c3c2b7;
+    --btn-bg: #2a78d6;
+    --btn-text: #ffffff;
+    --btn-hover: #1c5cab;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --surface-page: #0d0d0d;
+      --surface-card: #1a1a19;
+      --text-primary: #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted: #898781;
+      --gridline: #2c2c2a;
+      --baseline: #383835;
+      --border: rgba(255,255,255,0.10);
+      --series-afc: #3987e5;
+      --series-nfc: #d95926;
+      --series-afc-hover: #5598e7;
+      --series-nfc-hover: #eb6834;
+      --bar-bg: #2c2c2a;
+      --control-bg: #2c2c2a;
+      --control-border: #383835;
+      --btn-bg: #3987e5;
+      --btn-text: #ffffff;
+      --btn-hover: #5598e7;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --surface-page: #0d0d0d;
+    --surface-card: #1a1a19;
+    --text-primary: #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted: #898781;
+    --gridline: #2c2c2a;
+    --baseline: #383835;
+    --border: rgba(255,255,255,0.10);
+    --series-afc: #3987e5;
+    --series-nfc: #d95926;
+    --series-afc-hover: #5598e7;
+    --series-nfc-hover: #eb6834;
+    --bar-bg: #2c2c2a;
+    --control-bg: #2c2c2a;
+    --control-border: #383835;
+    --btn-bg: #3987e5;
+    --btn-text: #ffffff;
+    --btn-hover: #5598e7;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--surface-page);
+    color: var(--text-primary);
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 32px 20px;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .subtitle {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    margin-bottom: 24px;
+  }
+
+  /* Controls */
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: end;
+    margin-bottom: 24px;
+  }
+
+  .control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .control-group label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .control-group input, .control-group select {
+    font-family: inherit;
+    font-size: 0.875rem;
+    padding: 6px 10px;
+    border: 1px solid var(--control-border);
+    border-radius: 6px;
+    background: var(--control-bg);
+    color: var(--text-primary);
+    width: 120px;
+  }
+
+  .control-group select { width: 160px; }
+
+  button.run-btn {
+    font-family: inherit;
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 6px 20px;
+    border: none;
+    border-radius: 6px;
+    background: var(--btn-bg);
+    color: var(--btn-text);
+    cursor: pointer;
+    height: 34px;
+    transition: background 0.15s;
+  }
+  button.run-btn:hover { background: var(--btn-hover); }
+  button.run-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* Stats row */
+  .stats-row {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+
+  .stat-tile {
+    background: var(--surface-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 20px;
+    min-width: 140px;
+  }
+
+  .stat-tile .stat-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 2px;
+  }
+
+  .stat-tile .stat-value {
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+
+  /* Legend */
+  .legend {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .legend-swatch {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+  }
+
+  /* Chart card */
+  .chart-card {
+    background: var(--surface-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .chart-card h2 {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+
+  /* Bar rows */
+  .bar-row {
+    display: grid;
+    grid-template-columns: 170px 1fr 48px;
+    align-items: center;
+    gap: 10px;
+    padding: 3px 0;
+    border-bottom: 1px solid var(--gridline);
+    position: relative;
+  }
+
+  .bar-row:last-child { border-bottom: none; }
+
+  .bar-team {
+    font-size: 0.8125rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--text-primary);
+  }
+
+  .bar-track {
+    height: 18px;
+    background: var(--bar-bg);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 4px 0 0 4px;
+    transition: width 0.4s ease;
+    position: relative;
+  }
+
+  .bar-fill[data-full="true"] {
+    border-radius: 4px;
+  }
+
+  .bar-value {
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    color: var(--text-secondary);
+  }
+
+  /* Tooltip */
+  .tooltip {
+    position: fixed;
+    background: var(--surface-card);
+    border: 1px solid var(--baseline);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 0.8125rem;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.12s;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    max-width: 260px;
+  }
+
+  .tooltip.visible { opacity: 1; }
+
+  .tooltip-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+  }
+
+  .tooltip-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .tooltip-label { color: var(--text-muted); }
+  .tooltip-val { font-weight: 600; font-variant-numeric: tabular-nums; }
+
+  /* Sort tabs */
+  .sort-tabs {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 14px;
+    border-bottom: 1px solid var(--gridline);
+  }
+
+  .sort-tab {
+    font-family: inherit;
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 6px 12px;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: color 0.15s, border-color 0.15s;
+  }
+
+  .sort-tab:hover { color: var(--text-primary); }
+  .sort-tab.active {
+    color: var(--text-primary);
+    border-bottom-color: var(--btn-bg);
+  }
+
+  /* Loading state */
+  .loading-overlay {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 60px;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+  }
+
+  .loading-overlay.visible { display: flex; }
+
+  .charts-area.loading { opacity: 0.4; transition: opacity 0.2s; }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .bar-row { grid-template-columns: 120px 1fr 42px; }
+    .stats-row { gap: 12px; }
+    .stat-tile { min-width: 100px; padding: 10px 14px; }
+    .stat-tile .stat-value { font-size: 1.25rem; }
+    .controls { gap: 8px; }
+    .control-group input, .control-group select { width: 100px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>NFL Monte Carlo Simulator</h1>
+  <p class="subtitle">Predict playoff, division, conference, and Super Bowl probabilities by simulating thousands of seasons</p>
+
+  <div class="controls">
+    <div class="control-group">
+      <label for="trials">Trials</label>
+      <select id="trials">
+        <option value="1000">1,000</option>
+        <option value="5000">5,000</option>
+        <option value="10000" selected>10,000</option>
+        <option value="25000">25,000</option>
+        <option value="50000">50,000</option>
+        <option value="100000">100,000</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <label for="seed">Seed</label>
+      <input type="number" id="seed" value="42" min="1">
+    </div>
+    <button class="run-btn" id="run-btn">Simulate</button>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-tile">
+      <div class="stat-label">Trials</div>
+      <div class="stat-value" id="stat-trials">&mdash;</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-label">Time</div>
+      <div class="stat-value" id="stat-time">&mdash;</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-label">Throughput</div>
+      <div class="stat-value" id="stat-throughput">&mdash;</div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-swatch" style="background: var(--series-afc);"></div>
+      <span>AFC</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch" style="background: var(--series-nfc);"></div>
+      <span>NFC</span>
+    </div>
+  </div>
+
+  <div class="loading-overlay" id="loading">Simulating seasons&hellip;</div>
+
+  <div class="charts-area" id="charts-area">
+    <div class="chart-card" id="chart-championship">
+      <h2>Super Bowl Champion</h2>
+      <div class="sort-tabs" data-chart="championship">
+        <button class="sort-tab active" data-sort="championship_pct">By probability</button>
+        <button class="sort-tab" data-sort="division">By division</button>
+      </div>
+      <div class="chart-body"></div>
+    </div>
+
+    <div class="chart-card" id="chart-conference">
+      <h2>Conference Champion</h2>
+      <div class="sort-tabs" data-chart="conference">
+        <button class="sort-tab active" data-sort="conference_pct">By probability</button>
+        <button class="sort-tab" data-sort="division">By division</button>
+      </div>
+      <div class="chart-body"></div>
+    </div>
+
+    <div class="chart-card" id="chart-division">
+      <h2>Division Winner</h2>
+      <div class="sort-tabs" data-chart="division_title">
+        <button class="sort-tab active" data-sort="division_pct">By probability</button>
+        <button class="sort-tab" data-sort="division">By division</button>
+      </div>
+      <div class="chart-body"></div>
+    </div>
+
+    <div class="chart-card" id="chart-playoff">
+      <h2>Make Playoffs</h2>
+      <div class="sort-tabs" data-chart="playoff">
+        <button class="sort-tab active" data-sort="playoff_pct">By probability</button>
+        <button class="sort-tab" data-sort="division">By division</button>
+      </div>
+      <div class="chart-body"></div>
+    </div>
+  </div>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+(function() {
+  let data = null;
+  const tooltip = document.getElementById("tooltip");
+
+  const chartConfig = [
+    { id: "chart-championship", key: "championship_pct", label: "SB Champion" },
+    { id: "chart-conference",   key: "conference_pct",   label: "Conf Champion" },
+    { id: "chart-division",     key: "division_pct",     label: "Div Winner" },
+    { id: "chart-playoff",      key: "playoff_pct",      label: "Playoffs" },
+  ];
+
+  function formatNum(n) {
+    if (n >= 1e6) return (n / 1e6).toFixed(1) + "M";
+    if (n >= 1e3) return (n / 1e3).toFixed(1) + "K";
+    return n.toFixed(0);
+  }
+
+  function updateStats(d) {
+    document.getElementById("stat-trials").textContent = d.trials.toLocaleString();
+    document.getElementById("stat-time").textContent = d.elapsed_ms.toFixed(0) + " ms";
+    document.getElementById("stat-throughput").textContent = formatNum(d.seasons_per_sec) + "/s";
+  }
+
+  function sortTeams(teams, key) {
+    if (key === "division") {
+      return [...teams].sort((a, b) => {
+        const ca = a.conference.localeCompare(b.conference);
+        if (ca !== 0) return ca;
+        const da = a.division.localeCompare(b.division);
+        if (da !== 0) return da;
+        return b[teams[0].championship_pct !== undefined ? "championship_pct" : "playoff_pct"] -
+               a[teams[0].championship_pct !== undefined ? "championship_pct" : "playoff_pct"];
+      });
+    }
+    return [...teams].sort((a, b) => b[key] - a[key]);
+  }
+
+  function renderChart(cardId, valueKey, sortKey) {
+    if (!data) return;
+    const card = document.getElementById(cardId);
+    const body = card.querySelector(".chart-body");
+    const sorted = sortTeams(data.teams, sortKey);
+    const maxVal = Math.max(...sorted.map(t => t[valueKey]), 1);
+
+    body.innerHTML = "";
+    sorted.forEach(team => {
+      const pct = team[valueKey];
+      const widthPct = (pct / maxVal) * 100;
+      const isAfc = team.conference === "AFC";
+      const color = isAfc ? "var(--series-afc)" : "var(--series-nfc)";
+
+      const row = document.createElement("div");
+      row.className = "bar-row";
+      row.setAttribute("data-team", team.name);
+
+      const nameEl = document.createElement("div");
+      nameEl.className = "bar-team";
+      nameEl.textContent = team.name;
+
+      const track = document.createElement("div");
+      track.className = "bar-track";
+
+      const fill = document.createElement("div");
+      fill.className = "bar-fill";
+      fill.style.width = widthPct + "%";
+      fill.style.background = color;
+      if (widthPct >= 99.5) fill.setAttribute("data-full", "true");
+
+      const val = document.createElement("div");
+      val.className = "bar-value";
+      val.textContent = pct.toFixed(1) + "%";
+
+      track.appendChild(fill);
+      row.appendChild(nameEl);
+      row.appendChild(track);
+      row.appendChild(val);
+      body.appendChild(row);
+
+      row.addEventListener("pointerenter", (e) => showTooltip(e, team));
+      row.addEventListener("pointermove", (e) => moveTooltip(e));
+      row.addEventListener("pointerleave", hideTooltip);
+    });
+  }
+
+  function showTooltip(e, team) {
+    const conf = team.conference;
+    tooltip.innerHTML =
+      '<div class="tooltip-name">' + escapeHtml(team.name) + '</div>' +
+      '<div class="tooltip-row"><span class="tooltip-label">Conference</span><span class="tooltip-val">' + escapeHtml(conf + " " + team.division) + '</span></div>' +
+      '<div class="tooltip-row"><span class="tooltip-label">Elo</span><span class="tooltip-val">' + team.elo.toFixed(0) + '</span></div>' +
+      '<div class="tooltip-row"><span class="tooltip-label">Playoffs</span><span class="tooltip-val">' + team.playoff_pct.toFixed(1) + '%</span></div>' +
+      '<div class="tooltip-row"><span class="tooltip-label">Div Winner</span><span class="tooltip-val">' + team.division_pct.toFixed(1) + '%</span></div>' +
+      '<div class="tooltip-row"><span class="tooltip-label">Conf Champ</span><span class="tooltip-val">' + team.conference_pct.toFixed(1) + '%</span></div>' +
+      '<div class="tooltip-row"><span class="tooltip-label">SB Champ</span><span class="tooltip-val">' + team.championship_pct.toFixed(1) + '%</span></div>';
+    tooltip.classList.add("visible");
+    moveTooltip(e);
+  }
+
+  function moveTooltip(e) {
+    const pad = 12;
+    let x = e.clientX + pad;
+    let y = e.clientY + pad;
+    const rect = tooltip.getBoundingClientRect();
+    if (x + rect.width > window.innerWidth - pad) x = e.clientX - rect.width - pad;
+    if (y + rect.height > window.innerHeight - pad) y = e.clientY - rect.height - pad;
+    tooltip.style.left = x + "px";
+    tooltip.style.top = y + "px";
+  }
+
+  function hideTooltip() {
+    tooltip.classList.remove("visible");
+  }
+
+  function escapeHtml(s) {
+    const d = document.createElement("div");
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  function renderAll() {
+    if (!data) return;
+    updateStats(data);
+    chartConfig.forEach(cfg => {
+      const card = document.getElementById(cfg.id);
+      const activeTab = card.querySelector(".sort-tab.active");
+      const sortKey = activeTab ? activeTab.getAttribute("data-sort") : cfg.key;
+      renderChart(cfg.id, cfg.key, sortKey);
+    });
+  }
+
+  async function runSimulation() {
+    const btn = document.getElementById("run-btn");
+    const loading = document.getElementById("loading");
+    const chartsArea = document.getElementById("charts-area");
+    const trials = document.getElementById("trials").value;
+    const seed = document.getElementById("seed").value;
+
+    btn.disabled = true;
+    btn.textContent = "Running…";
+    chartsArea.classList.add("loading");
+
+    if (!data) {
+      loading.classList.add("visible");
+    }
+
+    try {
+      const resp = await fetch("/api/simulate?trials=" + encodeURIComponent(trials) + "&seed=" + encodeURIComponent(seed));
+      if (!resp.ok) {
+        const err = await resp.json();
+        alert("Simulation error: " + (err.error || "Unknown error"));
+        return;
+      }
+      data = await resp.json();
+      loading.classList.remove("visible");
+      renderAll();
+    } catch (e) {
+      alert("Could not reach the server. Is it running?");
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Simulate";
+      chartsArea.classList.remove("loading");
+    }
+  }
+
+  document.getElementById("run-btn").addEventListener("click", runSimulation);
+
+  document.querySelectorAll(".sort-tabs").forEach(tabs => {
+    tabs.querySelectorAll(".sort-tab").forEach(tab => {
+      tab.addEventListener("click", () => {
+        tabs.querySelectorAll(".sort-tab").forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+        renderAll();
+      });
+    });
+  });
+
+  runSimulation();
+})();
+</script>
+
+</body>
+</html>

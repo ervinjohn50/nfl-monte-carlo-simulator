@@ -5,7 +5,7 @@ SRC := src/elo_model.cpp src/schedule_generator.cpp src/season_simulator.cpp \
        src/monte_carlo_runner.cpp src/csv_loader.cpp
 LIB_OBJ := $(SRC:src/%.cpp=build/%.o)
 
-.PHONY: all clean test
+.PHONY: all clean test dashboard
 
 all: build/nfl_simulator
 
@@ -21,6 +21,9 @@ build/run_tests: $(LIB_OBJ) tests/test_main.cpp
 
 test: build/run_tests
 	./build/run_tests
+
+dashboard: build/nfl_simulator
+	.venv/bin/python3 server.py
 
 clean:
 	rm -rf build
