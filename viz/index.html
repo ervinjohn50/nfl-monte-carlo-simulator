@@ -250,8 +250,29 @@
 
   .elo-reset-bar {
     display: flex;
-    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
     margin-bottom: 10px;
+  }
+
+  .refresh-btn {
+    font-family: inherit;
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 4px 12px;
+    border: 1px solid var(--btn-bg);
+    border-radius: 6px;
+    background: var(--btn-bg);
+    color: var(--btn-text);
+    cursor: pointer;
+  }
+  .refresh-btn:hover { background: var(--btn-hover); }
+  .refresh-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .refresh-status {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-right: auto;
   }
 
   .reset-btn {
@@ -543,6 +564,8 @@
     <p class="elo-editor-subtitle">Adjust team ratings to explore "what if" scenarios</p>
     <div class="elo-editor-body" id="elo-editor-body">
       <div class="elo-reset-bar">
+        <button class="refresh-btn" id="espn-refresh">Refresh from ESPN</button>
+        <span class="refresh-status" id="refresh-status"></span>
         <button class="reset-btn" id="elo-reset">Reset all</button>
       </div>
       <div id="elo-teams"></div>
@@ -825,6 +848,34 @@
     buildEloEditor();
   }
 
+  async function refreshFromESPN() {
+    const btn = document.getElementById("espn-refresh");
+    const status = document.getElementById("refresh-status");
+    btn.disabled = true;
+    btn.textContent = "Fetching...";
+    status.textContent = "";
+
+    try {
+      const resp = await fetch("/api/refresh", { method: "POST" });
+      if (!resp.ok) {
+        const err = await resp.json();
+        status.textContent = "Error: " + (err.error || "Unknown error");
+        return;
+      }
+      const result = await resp.json();
+      baselineTeams = result.teams;
+      customTeams = baselineTeams.map(t => ({ ...t }));
+      buildEloEditor();
+      const now = new Date().toLocaleString();
+      status.textContent = "Updated from " + result.season + " season — " + now;
+    } catch (e) {
+      status.textContent = "Could not reach ESPN.";
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Refresh from ESPN";
+    }
+  }
+
   // --- Simulation ---
 
   async function runSimulation() {
@@ -879,6 +930,7 @@
 
   document.getElementById("run-btn").addEventListener("click", runSimulation);
   document.getElementById("elo-reset").addEventListener("click", resetElo);
+  document.getElementById("espn-refresh").addEventListener("click", refreshFromESPN);
 
   document.getElementById("elo-toggle").addEventListener("click", function() {
     const body = document.getElementById("elo-editor-body");

@@ -5,6 +5,8 @@ import subprocess
 import tempfile
 from flask import Flask, request, jsonify, send_from_directory
 
+from data.fetch_ratings import fetch_and_update
+
 app = Flask(__name__)
 
 SIMULATOR_BIN = "./build/nfl_simulator"
@@ -74,6 +76,15 @@ def simulate():
     finally:
         if tmp_file:
             os.unlink(tmp_file.name)
+
+@app.route("/api/refresh", methods=["POST"])
+def refresh():
+    try:
+        teams, season = fetch_and_update()
+        return jsonify({"teams": teams, "season": season})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 502
+
 
 if __name__ == "__main__":
     print(f"Starting server - simulator binary: {SIMULATOR_BIN}")

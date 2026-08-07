@@ -1,33 +1,33 @@
 name,conference,division,elo
-Buffalo Bills,AFC,East,1620
-Miami Dolphins,AFC,East,1490
-New England Patriots,AFC,East,1470
-New York Jets,AFC,East,1450
-Baltimore Ravens,AFC,North,1600
-Pittsburgh Steelers,AFC,North,1540
-Cincinnati Bengals,AFC,North,1520
-Cleveland Browns,AFC,North,1440
-Houston Texans,AFC,South,1560
-Indianapolis Colts,AFC,South,1480
-Jacksonville Jaguars,AFC,South,1470
-Tennessee Titans,AFC,South,1430
-Kansas City Chiefs,AFC,West,1630
-Los Angeles Chargers,AFC,West,1530
-Denver Broncos,AFC,West,1510
-Las Vegas Raiders,AFC,West,1460
-Philadelphia Eagles,NFC,East,1610
-Dallas Cowboys,NFC,East,1530
-Washington Commanders,NFC,East,1520
-New York Giants,NFC,East,1440
-Detroit Lions,NFC,North,1600
-Green Bay Packers,NFC,North,1560
-Minnesota Vikings,NFC,North,1520
-Chicago Bears,NFC,North,1470
-Tampa Bay Buccaneers,NFC,South,1520
-Atlanta Falcons,NFC,South,1490
-New Orleans Saints,NFC,South,1450
-Carolina Panthers,NFC,South,1420
-San Francisco 49ers,NFC,West,1560
-Los Angeles Rams,NFC,West,1550
-Seattle Seahawks,NFC,West,1500
-Arizona Cardinals,NFC,West,1460
+New England Patriots,AFC,East,1597
+Buffalo Bills,AFC,East,1561
+Miami Dolphins,AFC,East,1473
+New York Jets,AFC,East,1402
+Pittsburgh Steelers,AFC,North,1526
+Baltimore Ravens,AFC,North,1491
+Cincinnati Bengals,AFC,North,1455
+Cleveland Browns,AFC,North,1438
+Jacksonville Jaguars,AFC,South,1579
+Houston Texans,AFC,South,1561
+Indianapolis Colts,AFC,South,1491
+Tennessee Titans,AFC,South,1402
+Los Angeles Chargers,AFC,West,1544
+Kansas City Chiefs,AFC,West,1455
+Las Vegas Raiders,AFC,West,1402
+Denver Broncos,AFC,West,1597
+Philadelphia Eagles,NFC,East,1544
+Dallas Cowboys,NFC,East,1481
+Washington Commanders,NFC,East,1438
+New York Giants,NFC,East,1420
+Chicago Bears,NFC,North,1544
+Green Bay Packers,NFC,North,1518
+Minnesota Vikings,NFC,North,1508
+Detroit Lions,NFC,North,1508
+Carolina Panthers,NFC,South,1491
+Tampa Bay Buccaneers,NFC,South,1491
+Atlanta Falcons,NFC,South,1491
+New Orleans Saints,NFC,South,1455
+Los Angeles Rams,NFC,West,1561
+San Francisco 49ers,NFC,West,1561
+Arizona Cardinals,NFC,West,1402
+Seattle Seahawks,NFC,West,1597

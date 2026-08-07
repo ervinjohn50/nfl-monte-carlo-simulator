@@ -107,6 +107,8 @@ Then open `http://127.0.0.1:5050` in your browser.
 ### Features
 
 - **Live simulation** — change trials (1K–100K) and seed, re-run from the browser
+- **Live data from ESPN** — fetch current season standings from the ESPN API and convert win/loss records to Elo ratings with one click; automatically falls back to the most recent completed season during the offseason
+- **Elo editor** — adjust any team's rating with sliders to explore "what if" scenarios, with modified values highlighted and a one-click reset
 - **Four chart categories** — Super Bowl Champion, Conference Champion, Division Winner, Make Playoffs
 - **Sort by probability or division** — toggle between ranking and divisional grouping
 - **Hover tooltips** — see full stats for any team (Elo, all four probabilities)
@@ -141,7 +143,8 @@ tests/
 └── test_main.cpp             25 assertion-based tests (no external framework)
 
 data/
-└── teams.csv                 32 teams with conference, division, starting Elo
+├── teams.csv                 32 teams with conference, division, starting Elo
+└── fetch_ratings.py          Fetches live standings from ESPN API and converts to Elo
 ```
 
 ### Architecture
@@ -150,7 +153,11 @@ Each module is fully decoupled. The Elo model knows nothing about schedule const
 
 ## Team Data
 
-`data/teams.csv` uses illustrative starting Elo ratings for demonstration purposes. To produce predictions reflecting a real season, replace the Elo values with actual preseason power ratings.
+`data/teams.csv` ships with illustrative starting Elo ratings for demonstration purposes. Click "Refresh from ESPN" in the dashboard to fetch current season standings and convert them to Elo ratings automatically, or run the script directly:
+
+```bash
+python3 data/fetch_ratings.py
+```
 
 ```csv
 name,conference,division,elo
@@ -174,6 +181,4 @@ Philadelphia Eagles,NFC,East,1610
 - Backtest against historical seasons to validate model calibration (e.g., do teams given a 60% playoff probability actually make the playoffs ~60% of the time?)
 - Add margin-of-victory weighting to the Elo update function
 - Incorporate dynamic team-strength adjustment (e.g., mid-season Elo regression toward the mean to model roster changes)
-- Replace the CSV loader with a live stats API integration for real-time preseason ratings
 - Add a work-stealing thread pool for better load balancing at very high trial counts
-- Add an Elo editor to the dashboard for "what if" scenario modeling
