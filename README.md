@@ -60,7 +60,7 @@ Results across all trials are aggregated into per-team probabilities.
 docker compose up
 ```
 
-Then open `http://127.0.0.1:5050` in your browser. No compiler, Python, or dependencies needed — just Docker.
+Then open `http://127.0.0.1:5050` in your browser. No compiler, Python, or dependencies needed. Just Docker.
 
 ## Build & Run
 
