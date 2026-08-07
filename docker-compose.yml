@@ -1,0 +1,7 @@
+services:
+  simulator:
+    build: .
+    ports:
+      - "5050:5050"
+    environment:
+      - HOST=0.0.0.0

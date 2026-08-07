@@ -54,6 +54,14 @@ Results across all trials are aggregated into per-team probabilities.
 - Aggregate consistency (total playoff appearances = trials × 14, exactly one champion per trial)
 - Multithreaded correctness (single-threaded and multi-threaded runs both produce valid results)
 
+## Quick Start (Docker)
+
+```bash
+docker compose up
+```
+
+Then open `http://127.0.0.1:5050` in your browser. No compiler, Python, or dependencies needed — just Docker.
+
 ## Build & Run
 
 Requires a C++17 compiler. No external dependencies for the CLI. Uses only the C++ standard library.
@@ -138,6 +146,8 @@ viz/
 └── index.html                Interactive web dashboard (self-contained HTML/CSS/JS)
 
 server.py                   Flask API server (bridges the browser to the C++ binary)
+Dockerfile                  Container image build instructions
+docker-compose.yml          One-command container orchestration
 
 tests/
 └── test_main.cpp             25 assertion-based tests (no external framework)
